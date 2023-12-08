@@ -1,59 +1,73 @@
-﻿@model IEnumerable<Bookstore.Models.Book>
+﻿@model Bookstore.Models.ViewModels.BookIndexData
 
 @{
-    ViewData["Title"] = "Index";
+	ViewData["Title"] = "Books";
 }
 
-<h1>Index</h1>
+<h1>Books</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+	<a asp-action="Create">Create New</a>
 </p>
 <table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Genre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReleaseDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Author)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Genre)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReleaseDate)
-            </td>
-            <td>
-                @($"{item.Author.FirstName} {item.Author.LastName}")
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
+	<thead>
+		<tr>
+			<th>
+				@Html.DisplayNameFor(model => model.Books[0].Title)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Books[0].Genre)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Books[0].Price)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Books[0].ReleaseDate)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Books[0].Author)
+			</th>
+			<th></th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model.Books)
+		{
+			<tr>
+				<td>
+					@Html.DisplayFor(modelItem => item.Title)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Genre)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Price)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.ReleaseDate)
+				</td>
+				<td>
+					@($"{item.Author.FirstName} {item.Author.LastName}")
+				</td>
+				<td>
+					<form asp-controller="OrderDetails" asp-action="Create" class="row">
+						<input type="hidden" asp-for="OrderDetails.BookId" value="@item.Id" />
+						<input type="hidden" asp-for="OrderDetails.Book.Title" value="@item.Title" />
+						<input type="hidden" asp-for="OrderDetails.Book.Price" value="@item.Price" />
+						<div class="input-group">
+							<input asp-for="OrderDetails.Quantity" class="form-control" style="max-width: 60px; max-height: 30px" />
+							<span asp-validation-for="OrderDetails.Quantity" class="text-danger"></span>
+							<input type="submit" value="Add" class="btn btn-primary p-0 px-1" style="max-height: 30px;" />
+						</div>
+					</form>
+				</td>
+				<td>
+					<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+					<a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+					<a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+				</td>
+			</tr>
+		}
+	</tbody>
 </table>

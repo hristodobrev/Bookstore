@@ -1,4 +1,6 @@
-﻿namespace Bookstore.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Bookstore.Models
 {
 	public class Book
 	{
@@ -6,6 +8,8 @@
 		public string Title { get; set; }
 		public string Genre { get; set; }
 		public decimal Price { get; set; }
+		[DataType(DataType.Date)]
+		[DisplayFormat(DataFormatString = "{0:d}", ApplyFormatInEditMode = true)]
 		public DateTime ReleaseDate { get; set; }
 
 		public int AuthorId { get; set; }

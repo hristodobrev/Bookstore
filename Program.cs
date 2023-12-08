@@ -11,6 +11,13 @@ builder.Services.AddDbContext<BookstoreDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
 
+builder.Services.AddSession(options =>
+{
+	options.IdleTimeout = TimeSpan.FromSeconds(10);
+	options.Cookie.HttpOnly = true;
+	options.Cookie.IsEssential = true;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -28,7 +35,7 @@ using (var scope = app.Services.CreateScope())
 	try
 	{
 		var context = services.GetRequiredService<BookstoreDbContext>();
-		context.Database.EnsureCreated();
+		DbInitializer.Initialize(context);
 	}
 	catch (Exception ex)
 	{
@@ -43,6 +50,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllerRoute(
 	name: "default",

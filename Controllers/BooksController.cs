@@ -1,5 +1,6 @@
 ﻿using Bookstore.Data;
 using Bookstore.Models;
+using Bookstore.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +20,7 @@ namespace Bookstore.Controllers
 		{
 			var bookstoreDbContext = _context.Books.Include(b => b.Author);
 
-			return View(bookstoreDbContext.ToList());
+			return View(new BookIndexData { Books = bookstoreDbContext.ToList(), OrderDetails = new OrderDetails() });
 		}
 
 		public IActionResult Details(int? id)
