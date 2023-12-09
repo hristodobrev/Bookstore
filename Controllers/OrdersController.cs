@@ -8,123 +8,168 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Controllers
 {
-	public class OrdersController : Controller
-	{
-		private readonly BookstoreDbContext _context;
+    public class OrdersController : Controller
+    {
+        private readonly BookstoreDbContext _context;
 
-		public OrdersController(BookstoreDbContext context)
-		{
-			_context = context;
-		}
+        public OrdersController(BookstoreDbContext context)
+        {
+            _context = context;
+        }
 
-		public IActionResult Index()
-		{
-			var bookstoreDbContext = _context.Orders.Include(o => o.Customer);
+        public IActionResult Index()
+        {
+            var bookstoreDbContext = _context.Orders.Include(o => o.Customer);
 
-			return View(bookstoreDbContext.ToList());
-		}
+            return View(bookstoreDbContext.ToList());
+        }
 
-		public IActionResult Details(int? id)
-		{
-			var order = _context.Orders
-				.Include(o => o.Customer)
-				.FirstOrDefault(m => m.Id == id);
+        public IActionResult Details(int? id)
+        {
+            var order = _context.Orders
+                .Include(o => o.Customer)
+                .FirstOrDefault(m => m.Id == id);
 
-			return View(order);
-		}
+            var orderDetails = _context.OrderDetails
+                .Include(od => od.Book)
+                .Where(od => od.OrderId == order.Id)
+                .ToList();
 
-		public IActionResult Create()
-		{
-			List<OrderDetails> orderDetails = HttpContext.Session.GetObject<List<OrderDetails>>("ordersDetails");
-			if (orderDetails == null || orderDetails.Count == 0)
-			{
-				return RedirectToAction("Index", "Books");
-			}
-			foreach (var orderDetail in orderDetails)
-			{
-				orderDetail.Book = _context.Books.Where(b => b.Id == orderDetail.BookId).FirstOrDefault();
-				orderDetail.TotalPrice = orderDetail.Quantity * orderDetail.Book.Price;
-			}
+            return View(new OrderViewData { Order = order, OrderDetails = orderDetails });
+        }
 
-			ViewData["CustomerId"] = new SelectList(_context.Customers.Select(c => new { Id = c.Id, Name = $"{c.FirstName} {c.LastName}" }), "Id", "Name");
+        public IActionResult Create()
+        {
+            List<OrderDetails> orderDetails = HttpContext.Session.GetObject<List<OrderDetails>>("ordersDetails");
+            if (orderDetails == null || orderDetails.Count == 0)
+            {
+                return RedirectToAction("Index", "Books");
+            }
 
-			return View(new OrderCreateData { OrderDetails = orderDetails });
-		}
+            foreach (var orderDetail in orderDetails)
+            {
+                orderDetail.Book = _context.Books.Where(b => b.Id == orderDetail.BookId).FirstOrDefault();
+                orderDetail.TotalPrice = orderDetail.Quantity * orderDetail.Book.Price;
+            }
 
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public IActionResult Create([Bind("Id,OrderDate,CustomerId")] Order order)
-		{
-			List<OrderDetails> orderDetails = HttpContext.Session.GetObject<List<OrderDetails>>("ordersDetails");
-			if (ModelState.IsValid && orderDetails != null && orderDetails.Any())
-			{
-				_context.Add(order);
-				_context.SaveChanges();
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FullName");
 
-				foreach (var orderDetail in orderDetails)
-				{
-					orderDetail.OrderId = order.Id;
-				}
+            return View(new OrderViewData { OrderDetails = orderDetails });
+        }
 
-				_context.OrderDetails.AddRange(orderDetails);
-				_context.SaveChanges();
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create([Bind("Id,OrderDate,CustomerId")] Order order)
+        {
+            List<OrderDetails> orderDetails = HttpContext.Session.GetObject<List<OrderDetails>>("ordersDetails");
+            if (orderDetails == null || !orderDetails.Any())
+            {
+                return RedirectToAction("Index", "Books");
+            }
 
-				return RedirectToAction(nameof(Index));
-			}
+            if (ModelState.IsValid)
+            {
+                _context.Add(order);
+                _context.SaveChanges();
 
-			ViewData["CustomerId"] = new SelectList(_context.Customers.Select(c => new { Id = c.Id, Name = $"{c.FirstName} {c.LastName}" }), "Id", "Name");
+                foreach (var orderDetail in orderDetails)
+                {
+                    orderDetail.OrderId = order.Id;
+                    orderDetail.Book = _context.Books.Where(b => b.Id == orderDetail.BookId).FirstOrDefault();
+                    orderDetail.TotalPrice = orderDetail.Quantity * orderDetail.Book.Price;
+                }
 
-			return View(order);
-		}
+                order.OrderTotalPrice = orderDetails.Select(od => od.TotalPrice).Sum();
+                _context.Orders.Update(order);
+                _context.SaveChanges();
 
-		public IActionResult Edit(int? id)
-		{
-			var order = _context.Orders.Find(id);
+                _context.OrderDetails.AddRange(orderDetails);
+                _context.SaveChanges();
 
-			ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Id", order.CustomerId);
+                HttpContext.Session.ResetObject("ordersDetails");
 
-			return View(order);
-		}
+                return RedirectToAction(nameof(Index));
+            }
 
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public IActionResult Edit(int id, [Bind("Id,OrderDate,CustomerId")] Order order)
-		{
-			if (ModelState.IsValid)
-			{
-				_context.Update(order);
-				_context.SaveChanges();
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FullName");
 
-				return RedirectToAction(nameof(Index));
-			}
+            return View(new OrderViewData { OrderDetails = orderDetails });
+        }
 
-			ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Id", order.CustomerId);
+        public IActionResult Edit(int? id)
+        {
+            var order = _context.Orders.Find(id);
 
-			return View(order);
-		}
+            var orderDetails = _context.OrderDetails
+                .Include(od => od.Book)
+                .Where(od => od.OrderId == order.Id)
+                .ToList();
 
-		public IActionResult Delete(int? id)
-		{
-			var order = _context.Orders
-				.Include(o => o.Customer)
-				.FirstOrDefault(m => m.Id == id);
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FullName", order.CustomerId);
 
-			return View(order);
-		}
+            return View(new OrderViewData { Order = order, OrderDetails = orderDetails });
+        }
 
-		[HttpPost, ActionName("Delete")]
-		[ValidateAntiForgeryToken]
-		public IActionResult DeleteConfirmed(int id)
-		{
-			var order = _context.Orders.Find(id);
-			if (order != null)
-			{
-				_context.Orders.Remove(order);
-			}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, [Bind("Id,OrderDate,CustomerId,IsComplete,OrderTotalPrice")] Order order)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Update(order);
+                _context.SaveChanges();
 
-			_context.SaveChanges();
+                return RedirectToAction(nameof(Index));
+            }
 
-			return RedirectToAction(nameof(Index));
-		}
-	}
+            var orderDetails = _context.OrderDetails
+                .Include(od => od.Book)
+                .Where(od => od.OrderId == order.Id)
+                .ToList();
+
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FullName", order.CustomerId);
+
+            return View(new OrderViewData { Order = order, OrderDetails = orderDetails });
+        }
+
+        public IActionResult Delete(int? id)
+        {
+            var order = _context.Orders
+                .Include(o => o.Customer)
+                .FirstOrDefault(m => m.Id == id);
+            if (order.IsComplete)
+            {
+                return View(nameof(Index));
+            }
+
+            var orderDetails = _context.OrderDetails
+                .Include(od => od.Book)
+                .Where(od => od.OrderId == order.Id)
+                .ToList();
+
+            return View(new OrderViewData { Order = order, OrderDetails = orderDetails });
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var order = _context.Orders.Find(id);
+            if (order.IsComplete)
+            {
+                return View(nameof(Index));
+            }
+
+
+            if (order != null)
+            {
+                _context.OrderDetails.RemoveRange(_context.OrderDetails.Where(od => od.OrderId == id));
+                _context.Orders.Remove(order);
+            }
+
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
+        }
+    }
 }

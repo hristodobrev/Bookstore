@@ -1,4 +1,4 @@
-﻿@model Bookstore.Models.ViewModels.OrderCreateData
+﻿@model Bookstore.Models.ViewModels.OrderViewData
 
 @{
     ViewData["Title"] = "Create Order";
@@ -33,13 +33,13 @@
 							@Html.DisplayFor(modelItem => orderDetails.Book.Title)
 						</td>
 						<td>
-							$@Html.DisplayFor(modelItem => orderDetails.Book.Price)
+							@Html.DisplayFor(modelItem => orderDetails.Book.Price)
 						</td>
 						<td>
 							@Html.DisplayFor(modelItem => orderDetails.Quantity)
 						</td>
 						<td>
-							$@Html.DisplayFor(modelItem => orderDetails.TotalPrice)
+							@Html.DisplayFor(modelItem => orderDetails.TotalPrice)
 						</td>
 					</tr>
 				}
@@ -47,7 +47,7 @@
             <tfoot>
 				<tr>
                     <td colspan="3">Total</td>
-                    <td>$@(Model.OrderDetails.Select(od => od.TotalPrice).Sum()</td>
+                    <td>@string.Format("{0:c}", Model.OrderDetails.Select(od => od.TotalPrice).Sum())</td>
 				</tr>
 			</tfoot>
 		</table>

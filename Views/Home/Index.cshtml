@@ -4,5 +4,14 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <p>
+        Get starting with adding your first
+        <a asp-controller="Books" asp-action="Create">book</a>,
+        <a asp-controller="Authors" asp-action="Create">author</a> or
+        <a asp-controller="Customers" asp-action="Create">customer</a>.
+    </p>
+    <p>
+        Then you can proceed with managing your <a asp-controller="Orders" asp-action="Index">orders</a> or choose between the many 
+        <a asp-controller="Books" asp-action="Index">books</a> in our bookstore!
+    </p>
 </div>

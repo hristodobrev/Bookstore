@@ -16,5 +16,10 @@ namespace Bookstore.Extensions
 
 			return JsonSerializer.Deserialize<T>(session.GetString(key));
 		}
+
+		public static void ResetObject(this ISession session, string key)
+		{
+			session.Remove(key);
+		}
 	}
 }

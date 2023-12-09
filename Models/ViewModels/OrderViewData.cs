@@ -1,6 +1,6 @@
 ﻿namespace Bookstore.Models.ViewModels
 {
-	public class OrderCreateData
+	public class OrderViewData
 	{
 		public Order Order { get; set; }
 		public List<OrderDetails> OrderDetails { get; set; }

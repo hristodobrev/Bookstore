@@ -1,27 +1,75 @@
-﻿@model Bookstore.Models.Order
+﻿@model Bookstore.Models.ViewModels.OrderViewData
 
 @{
 	ViewData["Title"] = "Delete Order";
 }
 <h4>Delete Order</h4>
 <hr />
+<div class="row">
+	<div class="col-md-4">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>
+						@Html.DisplayNameFor(model => model.OrderDetails[0].Book.Title)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.OrderDetails[0].Book.Price)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.OrderDetails[0].Quantity)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.OrderDetails[0].TotalPrice)
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var orderDetails in Model.OrderDetails)
+				{
+					<tr>
+						<td>
+							@Html.DisplayFor(modelItem => orderDetails.Book.Title)
+						</td>
+						<td>
+							@Html.DisplayFor(modelItem => orderDetails.Book.Price)
+						</td>
+						<td>
+							@Html.DisplayFor(modelItem => orderDetails.Quantity)
+						</td>
+						<td>
+							@Html.DisplayFor(modelItem => orderDetails.TotalPrice)
+						</td>
+					</tr>
+				}
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="3">Total</td>
+					<td>@string.Format("{0:c}", Model.OrderDetails.Select(od => od.TotalPrice).Sum())</td>
+				</tr>
+			</tfoot>
+		</table>
+
+	</div>
+</div>
 <dl class="row">
 	<dt class="col-sm-2">
-		@Html.DisplayNameFor(model => model.OrderDate)
+		@Html.DisplayNameFor(model => model.Order.OrderDate)
 	</dt>
 	<dd class="col-sm-10">
-		@Html.DisplayFor(model => model.OrderDate)
+		@Html.DisplayFor(model => model.Order.OrderDate)
 	</dd>
 	<dt class="col-sm-2">
-		@Html.DisplayNameFor(model => model.Customer)
+		@Html.DisplayNameFor(model => model.Order.Customer)
 	</dt>
 	<dd class="col-sm-10">
-		@Html.DisplayFor(model => model.Customer.Id)
+		@Html.DisplayFor(model => model.Order.Customer.Id)
 	</dd>
 </dl>
 
 <form asp-action="Delete">
-	<input type="hidden" asp-for="Id" />
+	<input type="hidden" asp-for="Order.Id" />
 	<input type="submit" value="Delete" class="btn btn-danger" /> |
 	<a asp-action="Index">Back to List</a>
 </form>

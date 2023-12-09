@@ -7,6 +7,7 @@ namespace Bookstore.Models
 		public int Id { get; set; }
 		public string Title { get; set; }
 		public string Genre { get; set; }
+		[DisplayFormat(DataFormatString = "{0:c}")]
 		public decimal Price { get; set; }
 		[DataType(DataType.Date)]
 		[DisplayFormat(DataFormatString = "{0:d}", ApplyFormatInEditMode = true)]
