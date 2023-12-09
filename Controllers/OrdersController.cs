@@ -40,6 +40,11 @@ namespace Bookstore.Controllers
 			{
 				return RedirectToAction("Index", "Books");
 			}
+			foreach (var orderDetail in orderDetails)
+			{
+				orderDetail.Book = _context.Books.Where(b => b.Id == orderDetail.BookId).FirstOrDefault();
+				orderDetail.TotalPrice = orderDetail.Quantity * orderDetail.Book.Price;
+			}
 
 			ViewData["CustomerId"] = new SelectList(_context.Customers.Select(c => new { Id = c.Id, Name = $"{c.FirstName} {c.LastName}" }), "Id", "Name");
 
@@ -51,7 +56,7 @@ namespace Bookstore.Controllers
 		public IActionResult Create([Bind("Id,OrderDate,CustomerId")] Order order)
 		{
 			List<OrderDetails> orderDetails = HttpContext.Session.GetObject<List<OrderDetails>>("ordersDetails");
-			if (ModelState.IsValid && orderDetails != null)
+			if (ModelState.IsValid && orderDetails != null && orderDetails.Any())
 			{
 				_context.Add(order);
 				_context.SaveChanges();
@@ -67,7 +72,7 @@ namespace Bookstore.Controllers
 				return RedirectToAction(nameof(Index));
 			}
 
-			ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Id", order.CustomerId);
+			ViewData["CustomerId"] = new SelectList(_context.Customers.Select(c => new { Id = c.Id, Name = $"{c.FirstName} {c.LastName}" }), "Id", "Name");
 
 			return View(order);
 		}

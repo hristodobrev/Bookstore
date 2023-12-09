@@ -42,7 +42,7 @@
 					@Html.DisplayFor(modelItem => item.Genre)
 				</td>
 				<td>
-					@Html.DisplayFor(modelItem => item.Price)
+					$@Html.DisplayFor(modelItem => item.Price)
 				</td>
 				<td>
 					@Html.DisplayFor(modelItem => item.ReleaseDate)
@@ -53,10 +53,8 @@
 				<td>
 					<form asp-controller="OrderDetails" asp-action="Create" class="row">
 						<input type="hidden" asp-for="OrderDetails.BookId" value="@item.Id" />
-						<input type="hidden" asp-for="OrderDetails.Book.Title" value="@item.Title" />
-						<input type="hidden" asp-for="OrderDetails.Book.Price" value="@item.Price" />
 						<div class="input-group">
-							<input asp-for="OrderDetails.Quantity" class="form-control" style="max-width: 60px; max-height: 30px" />
+							<input asp-for="OrderDetails.Quantity" class="form-control" value="1" style="max-width: 60px; max-height: 30px" />
 							<span asp-validation-for="OrderDetails.Quantity" class="text-danger"></span>
 							<input type="submit" value="Add" class="btn btn-primary p-0 px-1" style="max-height: 30px;" />
 						</div>

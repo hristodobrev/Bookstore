@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@using Bookstore.Extensions
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    List<OrderDetails> orderDetails = HttpContextAccessor.HttpContext.Session.GetObject<List<OrderDetails>>("ordersDetails") ?? new List<OrderDetails>();
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -37,6 +44,15 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        @if (orderDetails.Any())
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Orders" asp-action="Create">
+                                    Cart
+                                    <span class="badge bg-primary">@orderDetails.Select(o => o.Quantity).Sum()</span>
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

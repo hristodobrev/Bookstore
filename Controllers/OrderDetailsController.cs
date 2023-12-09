@@ -33,8 +33,6 @@ namespace Bookstore.Controllers
 				orderDetails = new List<OrderDetails>();
 			}
 
-			data.OrderDetails.TotalPrice = data.OrderDetails.Quantity * data.OrderDetails.Book.Price;
-
 			orderDetails.Add(data.OrderDetails);
 
 			HttpContext.Session.SetObject("ordersDetails", orderDetails);
