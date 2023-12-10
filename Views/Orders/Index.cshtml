@@ -40,8 +40,12 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.OrderTotalPrice)
                 </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <td>              
+                    @if (!item.IsComplete)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <span>|</span>
+                    }
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a>
                     @if (!item.IsComplete)
                     {

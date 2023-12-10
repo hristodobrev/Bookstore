@@ -1,6 +1,7 @@
 ﻿using Bookstore.Data;
 using Bookstore.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Controllers
 {
@@ -79,12 +80,22 @@ namespace Bookstore.Controllers
 		public IActionResult DeleteConfirmed(int id)
 		{
 			var customer = _context.Customers.Find(id);
-			if (customer != null)
-			{
-				_context.Customers.Remove(customer);
-			}
 
-			_context.SaveChanges();
+			try
+			{
+				if (customer != null)
+				{
+					_context.Customers.Remove(customer);
+				}
+
+				_context.SaveChanges();
+			}
+			catch (DbUpdateException ex)
+			{
+				TempData["CustomerError"] = "Cannot delete this customer as they have existing orders.";
+
+				return View(customer);
+			}
 
 			return RedirectToAction(nameof(Index));
 		}

@@ -23,6 +23,7 @@
 					<th>
 						@Html.DisplayNameFor(model => model.OrderDetails[0].TotalPrice)
 					</th>
+                    <th></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -40,6 +41,12 @@
 						</td>
 						<td>
 							@Html.DisplayFor(modelItem => orderDetails.TotalPrice)
+						</td>
+                        <td>
+							<form asp-controller="OrderDetails" asp-action="Delete">
+								<input type="hidden" asp-for="OrderDetail.BookId" value="@orderDetails.BookId" />
+								<input type="submit" value="Remove" class="btn btn-danger p-0 px-1" style="max-height: 30px;" />
+							</form>
 						</td>
 					</tr>
 				}

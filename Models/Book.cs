@@ -10,7 +10,6 @@ namespace Bookstore.Models
 		[DisplayFormat(DataFormatString = "{0:c}")]
 		public decimal Price { get; set; }
 		[DataType(DataType.Date)]
-		[DisplayFormat(DataFormatString = "{0:d}", ApplyFormatInEditMode = true)]
 		public DateTime ReleaseDate { get; set; }
 
 		public int AuthorId { get; set; }
