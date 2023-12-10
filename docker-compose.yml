@@ -1,0 +1,22 @@
+﻿version: "3.3"
+
+services:
+    sqlserver:
+        container_name: sql_server
+        image: mcr.microsoft.com/mssql/server
+        ports:
+            - "1433:1433"
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=replaceWithYourPass
+        volumes:
+            - sqldata:/var/opt/mssql
+    web-app:
+        container_name: web-app
+        image: chrisdobrev/bookstore
+        ports:
+            - "8082:8080"
+        restart: on-failure
+
+volumes:
+    sqldata:
